@@ -1,0 +1,279 @@
+{
+  "version": "1.0",
+  "repo": "ci-bench-L1",
+  "difficulty": "L1",
+  "description": "Ground truth queries for evaluating Code Intelligence RAG on the pyvalidate library.",
+  "queries": [
+    {
+      "id": "L1-Q001",
+      "question": "How is email validation implemented? Show me the EmailValidator class.",
+      "category": "direct_retrieval",
+      "difficulty": "easy",
+      "expected_primary_file": "src/pyvalidate/validators/string_validators.py",
+      "expected_symbols": ["EmailValidator", "validate"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/validators/string_validators.py", "symbol": "EmailValidator"}
+      ],
+      "key_answer_points": ["EmailValidator", "regex", "_EMAIL_PATTERN", "RFC"],
+      "notes": "Direct class lookup. Primary retrieval test."
+    },
+    {
+      "id": "L1-Q002",
+      "question": "Where is the BaseValidator abstract class defined and what methods must subclasses implement?",
+      "category": "direct_retrieval",
+      "difficulty": "easy",
+      "expected_primary_file": "src/pyvalidate/base.py",
+      "expected_symbols": ["BaseValidator", "validate"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/base.py", "symbol": "BaseValidator"}
+      ],
+      "key_answer_points": ["BaseValidator", "abc.ABC", "abstractmethod", "validate"],
+      "notes": "Base class lookup."
+    },
+    {
+      "id": "L1-Q003",
+      "question": "How does RangeValidator work? Can I set exclusive bounds?",
+      "category": "direct_retrieval",
+      "difficulty": "easy",
+      "expected_primary_file": "src/pyvalidate/validators/numeric_validators.py",
+      "expected_symbols": ["RangeValidator", "exclusive_min", "exclusive_max"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/validators/numeric_validators.py", "symbol": "RangeValidator"}
+      ],
+      "key_answer_points": ["exclusive_min", "exclusive_max", "min_value", "max_value"],
+      "notes": "Direct validator lookup with parameter question."
+    },
+    {
+      "id": "L1-Q004",
+      "question": "Show me the Schema class and explain how to use it for dict validation.",
+      "category": "direct_retrieval",
+      "difficulty": "easy",
+      "expected_primary_file": "src/pyvalidate/schema/schema.py",
+      "expected_symbols": ["Schema", "validate", "validate_strict"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/schema/schema.py", "symbol": "Schema"}
+      ],
+      "key_answer_points": ["Schema", "Field", "validate", "validate_strict", "SchemaError"],
+      "notes": "Schema class lookup."
+    },
+    {
+      "id": "L1-Q005",
+      "question": "What is ValidationResult and what fields does it have?",
+      "category": "direct_retrieval",
+      "difficulty": "easy",
+      "expected_primary_file": "src/pyvalidate/base.py",
+      "expected_symbols": ["ValidationResult", "is_valid", "errors", "value"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/base.py", "symbol": "ValidationResult"}
+      ],
+      "key_answer_points": ["is_valid", "errors", "value", "dataclass"],
+      "notes": "Data class lookup."
+    },
+    {
+      "id": "L1-Q006",
+      "question": "What validators can I use for validating URL strings?",
+      "category": "behavioral",
+      "difficulty": "easy",
+      "expected_primary_file": "src/pyvalidate/validators/string_validators.py",
+      "expected_symbols": ["URLValidator"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/validators/string_validators.py", "symbol": "URLValidator"}
+      ],
+      "key_answer_points": ["URLValidator", "allowed_schemes", "require_tld"],
+      "notes": "Capability discovery question."
+    },
+    {
+      "id": "L1-Q007",
+      "question": "How do I validate that a date range is valid and doesn't exceed 30 days?",
+      "category": "behavioral",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/validators/date_validators.py",
+      "expected_symbols": ["DateRangeValidator", "max_span_days"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/validators/date_validators.py", "symbol": "DateRangeValidator"}
+      ],
+      "key_answer_points": ["DateRangeValidator", "max_span_days", "allow_same_day"],
+      "notes": "Behavioral question requiring parameter knowledge."
+    },
+    {
+      "id": "L1-Q008",
+      "question": "How can I make a field optional with a default value in a Schema?",
+      "category": "behavioral",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/schema/field.py",
+      "expected_symbols": ["Field", "required", "default", "default_factory"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/schema/field.py", "symbol": "Field"},
+        {"file": "src/pyvalidate/schema/schema.py", "symbol": "Schema"}
+      ],
+      "key_answer_points": ["required=False", "default", "default_factory"],
+      "notes": "Cross-class behavioral question."
+    },
+    {
+      "id": "L1-Q009",
+      "question": "How do I combine multiple validators with AND logic so all must pass?",
+      "category": "behavioral",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/validators/composite_validators.py",
+      "expected_symbols": ["AllValidator", "ChainValidator"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/validators/composite_validators.py", "symbol": "AllValidator"},
+        {"file": "src/pyvalidate/validators/composite_validators.py", "symbol": "ChainValidator"}
+      ],
+      "key_answer_points": ["AllValidator", "fail_fast", "ChainValidator"],
+      "notes": "Composite validator usage."
+    },
+    {
+      "id": "L1-Q010",
+      "question": "How do I validate that a person is at least 18 years old using their date of birth?",
+      "category": "behavioral",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/validators/date_validators.py",
+      "expected_symbols": ["AgeValidator", "min_age"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/validators/date_validators.py", "symbol": "AgeValidator"}
+      ],
+      "key_answer_points": ["AgeValidator", "min_age", "_compute_age"],
+      "notes": "Age validation use case."
+    },
+    {
+      "id": "L1-Q011",
+      "question": "Which transformers work with email-type string fields? Is there a normalize_email function?",
+      "category": "cross_module",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/transformers/normalizers.py",
+      "expected_symbols": ["normalize_email"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/transformers/normalizers.py", "symbol": "normalize_email"},
+        {"file": "src/pyvalidate/validators/string_validators.py", "symbol": "EmailValidator"}
+      ],
+      "key_answer_points": ["normalize_email", "lowercase", "strip"],
+      "notes": "Cross-module question linking validators and transformers."
+    },
+    {
+      "id": "L1-Q012",
+      "question": "How does the ValidationCache work and where is it used?",
+      "category": "cross_module",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/utils/cache.py",
+      "expected_symbols": ["ValidationCache", "get", "set", "_default_cache"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/utils/cache.py", "symbol": "ValidationCache"},
+        {"file": "src/pyvalidate/utils/cache.py", "symbol": "get_default_cache"}
+      ],
+      "key_answer_points": ["ValidationCache", "LRU", "OrderedDict", "thread-safe", "max_size"],
+      "notes": "Cache implementation and usage discovery."
+    },
+    {
+      "id": "L1-Q013",
+      "question": "What utility functions are available for working with nested error dictionaries?",
+      "category": "cross_module",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/utils/helpers.py",
+      "expected_symbols": ["flatten_errors", "format_error_path"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/utils/helpers.py", "symbol": "flatten_errors"},
+        {"file": "src/pyvalidate/utils/helpers.py", "symbol": "format_error_path"}
+      ],
+      "key_answer_points": ["flatten_errors", "format_error_path", "nested dict"],
+      "notes": "Utility discovery question."
+    },
+    {
+      "id": "L1-Q014",
+      "question": "How do I use DynamicSchema when I need to build a schema at runtime from configuration?",
+      "category": "cross_module",
+      "difficulty": "hard",
+      "expected_primary_file": "src/pyvalidate/schema/schema.py",
+      "expected_symbols": ["DynamicSchema", "_collect_fields"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/schema/schema.py", "symbol": "DynamicSchema"}
+      ],
+      "key_answer_points": ["DynamicSchema", "fields parameter", "_collect_fields", "_dynamic_fields"],
+      "notes": "Advanced schema usage."
+    },
+    {
+      "id": "L1-Q015",
+      "question": "How can I create a conditional validator that only validates a field when a condition is met?",
+      "category": "cross_module",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/validators/composite_validators.py",
+      "expected_symbols": ["ConditionalValidator", "condition", "then_validator"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/validators/composite_validators.py", "symbol": "ConditionalValidator"}
+      ],
+      "key_answer_points": ["ConditionalValidator", "condition callable", "then_validator", "else_validator"],
+      "notes": "Conditional logic usage."
+    },
+    {
+      "id": "L1-Q016",
+      "question": "Find all validator classes that compile a regular expression pattern at instantiation time.",
+      "category": "code_similarity",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/validators/string_validators.py",
+      "expected_symbols": ["EmailValidator", "URLValidator", "RegexValidator", "SlugValidator", "IPAddressValidator", "PhoneValidator"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/validators/string_validators.py", "symbol": "EmailValidator"},
+        {"file": "src/pyvalidate/validators/string_validators.py", "symbol": "URLValidator"},
+        {"file": "src/pyvalidate/validators/string_validators.py", "symbol": "RegexValidator"}
+      ],
+      "key_answer_points": ["re.compile", "_EMAIL_PATTERN", "_URL_PATTERN", "_SLUG_PATTERN", "_PHONE_PATTERN"],
+      "notes": "Similarity query: find all regex-using validators."
+    },
+    {
+      "id": "L1-Q017",
+      "question": "Which validators use the _make_error helper method inherited from BaseValidator?",
+      "category": "code_similarity",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/base.py",
+      "expected_symbols": ["BaseValidator._make_error"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/base.py", "symbol": "BaseValidator._make_error"},
+        {"file": "src/pyvalidate/validators/string_validators.py", "symbol": "EmailValidator.validate"},
+        {"file": "src/pyvalidate/validators/numeric_validators.py", "symbol": "RangeValidator.validate"}
+      ],
+      "key_answer_points": ["_make_error", "pattern used across all validators"],
+      "notes": "Cross-file pattern detection: _make_error usage."
+    },
+    {
+      "id": "L1-Q018",
+      "question": "Are there any legacy or deprecated functions that duplicate logic already present in other modules?",
+      "category": "code_similarity",
+      "difficulty": "hard",
+      "expected_primary_file": "src/pyvalidate/transformers/normalizers.py",
+      "expected_symbols": ["_legacy_clean_email", "_legacy_clean_phone", "_legacy_to_slug"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/transformers/normalizers.py", "symbol": "_legacy_clean_email"},
+        {"file": "src/pyvalidate/transformers/normalizers.py", "symbol": "_legacy_clean_phone"},
+        {"file": "src/pyvalidate/transformers/normalizers.py", "symbol": "_legacy_to_slug"}
+      ],
+      "key_answer_points": ["legacy: kept for backwards compat", "normalize_email", "normalize_phone", "slugify"],
+      "notes": "Legacy code detection. Key duplicate detection test case."
+    },
+    {
+      "id": "L1-Q019",
+      "question": "What does the is_empty utility function consider as empty? Does it handle collections?",
+      "category": "documentation_gap",
+      "difficulty": "easy",
+      "expected_primary_file": "src/pyvalidate/utils/helpers.py",
+      "expected_symbols": ["is_empty"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/utils/helpers.py", "symbol": "is_empty"}
+      ],
+      "key_answer_points": ["None", "empty string after strip", "empty list/dict/set/tuple"],
+      "notes": "Documentation gap: answer derived from reading the code."
+    },
+    {
+      "id": "L1-Q020",
+      "question": "How does the SchemaError format its error message and what methods can I use to get the errors as a dict?",
+      "category": "documentation_gap",
+      "difficulty": "medium",
+      "expected_primary_file": "src/pyvalidate/schema/errors.py",
+      "expected_symbols": ["SchemaError", "to_dict", "_format_message"],
+      "expected_chunks": [
+        {"file": "src/pyvalidate/schema/errors.py", "symbol": "SchemaError"}
+      ],
+      "key_answer_points": ["SchemaError", "to_dict", "_format_message", "FieldError list"],
+      "notes": "Error handling pattern documentation."
+    }
+  ]
+}

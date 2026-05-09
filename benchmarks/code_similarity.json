@@ -1,0 +1,117 @@
+{
+  "version": "1.0",
+  "repo": "ci-bench-L1",
+  "description": "Semantically similar code pairs for testing duplicate/reuse detection in the RAG system.",
+  "pairs": [
+    {
+      "id": "SIM-L1-001",
+      "description": "EmailValidator.validate and URLValidator.validate both use compiled regex via re.match",
+      "file_a": "src/pyvalidate/validators/string_validators.py",
+      "symbol_a": "EmailValidator.validate",
+      "file_b": "src/pyvalidate/validators/string_validators.py",
+      "symbol_b": "URLValidator.validate",
+      "similarity_type": "structural",
+      "similarity_score": 0.85,
+      "notes": "Both compile a pattern at module level, call pattern.match(value), and return ValidationResult.fail on mismatch."
+    },
+    {
+      "id": "SIM-L1-002",
+      "description": "normalize_email (normalizers.py) duplicates logic of _legacy_clean_email",
+      "file_a": "src/pyvalidate/transformers/normalizers.py",
+      "symbol_a": "normalize_email",
+      "file_b": "src/pyvalidate/transformers/normalizers.py",
+      "symbol_b": "_legacy_clean_email",
+      "similarity_type": "semantic_duplicate",
+      "similarity_score": 0.92,
+      "notes": "Both lowercase and strip email. Legacy version also removes spaces (slightly different behaviour)."
+    },
+    {
+      "id": "SIM-L1-003",
+      "description": "normalize_phone (normalizers.py) duplicates logic of _legacy_clean_phone",
+      "file_a": "src/pyvalidate/transformers/normalizers.py",
+      "symbol_a": "normalize_phone",
+      "file_b": "src/pyvalidate/transformers/normalizers.py",
+      "symbol_b": "_legacy_clean_phone",
+      "similarity_type": "semantic_duplicate",
+      "similarity_score": 0.88,
+      "notes": "Both strip non-digit characters. normalize_phone uses re.sub (faster); _legacy iterates char by char."
+    },
+    {
+      "id": "SIM-L1-004",
+      "description": "slugify (normalizers.py) duplicates logic of _legacy_to_slug",
+      "file_a": "src/pyvalidate/transformers/normalizers.py",
+      "symbol_a": "slugify",
+      "file_b": "src/pyvalidate/transformers/normalizers.py",
+      "symbol_b": "_legacy_to_slug",
+      "similarity_type": "semantic_duplicate",
+      "similarity_score": 0.80,
+      "notes": "Both produce URL-safe slugs. slugify handles unicode normalization (NFKD); _legacy_to_slug does not."
+    },
+    {
+      "id": "SIM-L1-005",
+      "description": "ListValidator item-level error collection pattern mirrors DictValidator's pattern",
+      "file_a": "src/pyvalidate/validators/collection_validators.py",
+      "symbol_a": "ListValidator.validate",
+      "file_b": "src/pyvalidate/validators/collection_validators.py",
+      "symbol_b": "DictValidator.validate",
+      "similarity_type": "structural",
+      "similarity_score": 0.75,
+      "notes": "Both iterate children, call item_validator, accumulate errors list, and return ValidationResult(is_valid=False, errors=...) on failure."
+    },
+    {
+      "id": "SIM-L1-006",
+      "description": "FutureDateValidator and PastDateValidator share identical date-parsing logic",
+      "file_a": "src/pyvalidate/validators/date_validators.py",
+      "symbol_a": "FutureDateValidator.validate",
+      "file_b": "src/pyvalidate/validators/date_validators.py",
+      "symbol_b": "PastDateValidator.validate",
+      "similarity_type": "structural",
+      "similarity_score": 0.90,
+      "notes": "Both branches parse date from datetime/date/str using the same 3-branch isinstance check before comparing to reference date."
+    },
+    {
+      "id": "SIM-L1-007",
+      "description": "PositiveValidator and NegativeValidator are near-symmetric implementations",
+      "file_a": "src/pyvalidate/validators/numeric_validators.py",
+      "symbol_a": "PositiveValidator.validate",
+      "file_b": "src/pyvalidate/validators/numeric_validators.py",
+      "symbol_b": "NegativeValidator.validate",
+      "similarity_type": "structural",
+      "similarity_score": 0.88,
+      "notes": "Same structure: type check, allow_zero branch, comparison, return ok/fail."
+    },
+    {
+      "id": "SIM-L1-008",
+      "description": "AllValidator and ChainValidator both iterate validators but differ in what value they pass forward",
+      "file_a": "src/pyvalidate/validators/composite_validators.py",
+      "symbol_a": "AllValidator.validate",
+      "file_b": "src/pyvalidate/validators/composite_validators.py",
+      "symbol_b": "ChainValidator.validate",
+      "similarity_type": "near_duplicate",
+      "similarity_score": 0.72,
+      "notes": "Key difference: AllValidator collects all errors; ChainValidator short-circuits and pipes coerced value."
+    },
+    {
+      "id": "SIM-L1-009",
+      "description": "to_upper and to_lower in converters.py are mirror functions",
+      "file_a": "src/pyvalidate/transformers/converters.py",
+      "symbol_a": "to_upper",
+      "file_b": "src/pyvalidate/transformers/converters.py",
+      "symbol_b": "to_lower",
+      "similarity_type": "structural",
+      "similarity_score": 0.95,
+      "notes": "Identical structure, only .upper() vs .lower() differs."
+    },
+    {
+      "id": "SIM-L1-010",
+      "description": "ValidationCache.get and ValidationCache.set both call _make_key and use the _lock context manager",
+      "file_a": "src/pyvalidate/utils/cache.py",
+      "symbol_a": "ValidationCache.get",
+      "file_b": "src/pyvalidate/utils/cache.py",
+      "symbol_b": "ValidationCache.set",
+      "similarity_type": "structural",
+      "similarity_score": 0.70,
+      "notes": "Both call self._make_key then operate under self._lock. Candidate for a shared internal helper."
+    }
+  ]
+}
