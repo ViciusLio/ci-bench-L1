@@ -318,6 +318,57 @@ Chunk overlap   : 64–128 tokens
 
 ---
 
+## RAG Quick Start — query this repo with a local LLM
+
+You can make this codebase directly queryable using the companion tools in the
+[CodeIntelligence](https://github.com/ViciusLio/CodeIntelligence) project.
+
+### 1. Generate the chunks (one-off)
+
+```bash
+git clone https://github.com/ViciusLio/CodeIntelligence
+cd CodeIntelligence
+
+# Parse ci-bench-L1 into semantic RAG chunks (stdlib only, no dependencies)
+python parse_repo.py ../ci-bench-L1 --output ci_bench_L1_chunks.jsonl
+# → writes 584 chunks (1 overview + 28 file + 463 function + 92 class)
+```
+
+### 2a. Query with Claude API
+
+```bash
+pip install anthropic
+export ANTHROPIC_API_KEY=sk-...
+
+python ask_repo.py ci_bench_L1_chunks.jsonl "How does EmailValidator check an address?"
+```
+
+### 2b. Query with a local LLM (Ollama — no API key needed)
+
+```bash
+# Install Ollama from https://ollama.com, then:
+ollama pull qwen2.5-coder:7b   # ~4.5 GB, best code model for the size
+ollama serve                    # keep this terminal open
+
+python ask_repo_local.py ci_bench_L1_chunks.jsonl \
+    "Is email normalisation logic duplicated anywhere?" \
+    --model qwen2.5-coder:7b
+```
+
+### How it works
+
+```
+parse_repo.py  ──► repo_chunks.jsonl  ──► ask_repo.py        (Claude API)
+  (AST parser,                            ask_repo_local.py  (Ollama / any local LLM)
+   stdlib only)
+```
+
+The JSONL is model-agnostic — generate once, query with any LLM.
+TF-IDF retrieval selects the most relevant chunks before sending them as context,
+reducing token usage by ~95–99% compared to passing the full codebase.
+
+---
+
 ## Relation to the full benchmark suite
 
 ```
