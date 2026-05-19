@@ -330,11 +330,12 @@ git clone https://github.com/ViciusLio/CodeIntelligence
 cd CodeIntelligence
 
 # Parse ci-bench-L1 into semantic RAG chunks (stdlib only, no dependencies)
+# Includes function/class chunks + cross-reference usage index
 python parse_repo.py ../ci-bench-L1 --output ci_bench_L1_chunks.jsonl
-# → writes 584 chunks (1 overview + 28 file + 463 function + 92 class)
+# -> writes ~600 chunks (overview + file + function + class + usages)
 ```
 
-### 2a. Query with Claude API
+### 2a. Query with Claude API (cloud)
 
 ```bash
 pip install anthropic
@@ -355,17 +356,76 @@ python ask_repo_local.py ci_bench_L1_chunks.jsonl \
     --model qwen2.5-coder:7b
 ```
 
+### 3. Upgrade to semantic retrieval (recommended)
+
+TF-IDF is fast but misses synonyms and semantic matches. Embed once with
+`nomic-embed-text` (free, runs locally) to unlock cosine-similarity retrieval:
+
+```bash
+ollama pull nomic-embed-text
+
+# Embed all chunks (~1-2 min for L1)
+python embed_chunks.py ci_bench_L1_chunks.jsonl
+# -> writes ci_bench_L1_chunks_embedded.jsonl
+
+# Query with semantic retrieval
+python ask_repo_local.py ci_bench_L1_chunks_embedded.jsonl \
+    "Where is email normalisation logic?" \
+    --embed --model qwen2.5-coder:7b
+
+# Add cross-encoder re-ranking for even better precision
+pip install sentence-transformers
+python ask_repo_local.py ci_bench_L1_chunks_embedded.jsonl \
+    "Where is email normalisation logic?" \
+    --embed --rerank --model qwen2.5-coder:7b
+```
+
+Re-run embedding only when source files change (skips unchanged files):
+
+```bash
+python embed_chunks.py ci_bench_L1_chunks.jsonl --incremental
+```
+
+### 4. Launch the chat server (optional)
+
+Serves a built-in chat UI + OpenAI / Ollama / Anthropic compatible endpoints:
+
+```bash
+python rag_server.py ci_bench_L1_chunks_embedded.jsonl \
+    --embed --rerank --model qwen2.5-coder:7b
+
+# Open http://localhost:8080 in your browser for the chat UI
+# Or query via API:
+curl http://localhost:8080/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"qwen2.5-coder:7b","messages":[{"role":"user","content":"How does EmailValidator work?"}]}'
+```
+
+For a persistent vector store (survives server restarts):
+
+```bash
+pip install chromadb
+python rag_server.py ci_bench_L1_chunks_embedded.jsonl \
+    --embed --rerank --chroma --model qwen2.5-coder:7b
+```
+
 ### How it works
 
 ```
-parse_repo.py  ──► repo_chunks.jsonl  ──► ask_repo.py        (Claude API)
-  (AST parser,                            ask_repo_local.py  (Ollama / any local LLM)
-   stdlib only)
+parse_repo.py  ->  repo_chunks.jsonl
+  (AST parser,       |
+   stdlib only)      v
+                 embed_chunks.py  ->  repo_chunks_embedded.jsonl
+                   (Ollama,              |
+                    incremental)         v
+                                    ask_repo_local.py   (CLI, Ollama)
+                                    ask_repo.py         (CLI, Claude API)
+                                    rag_server.py       (HTTP server + chat UI)
 ```
 
 The JSONL is model-agnostic — generate once, query with any LLM.
-TF-IDF retrieval selects the most relevant chunks before sending them as context,
-reducing token usage by ~95–99% compared to passing the full codebase.
+TF-IDF retrieval reduces token usage by ~95–99% vs. passing the full codebase;
+semantic embeddings + re-ranking further improve retrieval quality on harder queries.
 
 ---
 
